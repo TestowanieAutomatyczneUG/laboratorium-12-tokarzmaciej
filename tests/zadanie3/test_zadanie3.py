@@ -31,6 +31,30 @@ class testMessenger(TestCase):
         result = self.temp.sendMessage
         self.assertRaisesRegex(Exception, 'Error Server', result, 'maciek@example.com', 'Hello')
 
+    def test_messenger_send_bad_email(self):
+        MailServer = Mock()
+        MailServer.sendMessage.return_value = True
+        self.temp.MailServer = MailServer
+
+        TemplateEngine = Mock()
+        TemplateEngine.sendMessage.side_effect = Exception("Bad email")
+        self.temp.TemplateEngine = TemplateEngine
+
+        result = self.temp.sendMessage
+        self.assertRaisesRegex(Exception, 'Bad email', result, 'maciek_example.com', 'Hello')
+
+    def test_messenger_send_bad_message(self):
+        MailServer = Mock()
+        MailServer.sendMessage.return_value = True
+        self.temp.MailServer = MailServer
+
+        TemplateEngine = Mock()
+        TemplateEngine.sendMessage.side_effect = TypeError("Bad type message")
+        self.temp.TemplateEngine = TemplateEngine
+
+        result = self.temp.sendMessage
+        self.assertRaisesRegex(Exception, "Bad type message", result, 'maciek@example.com', False)
+
     def test_messenger_receive(self):
         MailServer = Mock()
         MailServer.receiveMessage.return_value = True
